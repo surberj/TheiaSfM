@@ -89,13 +89,8 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    // We write the default values for aspect ratio, skew, and radial distortion
-    // since those cannot be recovered from EXIF.
-    LOG(INFO) << image_name << " has an EXIF focal length of "
-              << prior.focal_length.value;
-    ofs << image_name << " " << prior.focal_length.value << " "
-        << prior.principal_point[0].value << " "
-        << prior.principal_point[1].value << " 1.0 0.0 0.0 0.0\n";
+    // We write the following values for aspect ratio, skew, and radial distortion
+    ofs << image_name << " 614 367 267 1.0 1.0 -0.4 0.17\n";  // phycam_72 calibration from kalibr and matlab
   }
   ofs.close();
 }
