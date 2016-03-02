@@ -12,6 +12,9 @@ TARGET_LINK_LIBRARIES(compute_two_view_geometry theia ${GFLAGS_LIBRARIES} ${GLOG
 ADD_EXECUTABLE(build_reconstruction build_reconstruction.cc)
 TARGET_LINK_LIBRARIES(build_reconstruction theia ${GFLAGS_LIBRARIES} ${GLOG_LIBRARIES})
 
+ADD_EXECUTABLE(build_reconstruction_with_extrinsics build_reconstruction_with_extrinsics.cc)
+TARGET_LINK_LIBRARIES(build_reconstruction_with_extrinsics theia ${GFLAGS_LIBRARIES} ${GLOG_LIBRARIES})
+
 ADD_EXECUTABLE(build_1dsfm_reconstruction build_1dsfm_reconstruction.cc)
 TARGET_LINK_LIBRARIES(build_1dsfm_reconstruction theia ${GFLAGS_LIBRARIES} ${GLOG_LIBRARIES})
 

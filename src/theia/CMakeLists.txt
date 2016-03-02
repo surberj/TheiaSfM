@@ -46,6 +46,7 @@ set(THEIA_SRC
   io/read_1dsfm.cc
   io/read_bundler_files.cc
   io/read_calibration.cc
+  io/read_extrinsics.cc
   io/read_keypoints_and_descriptors.cc
   io/read_matches.cc
   io/read_matches_deprecated.cc

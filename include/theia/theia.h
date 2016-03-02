@@ -50,6 +50,7 @@
 #include "theia/io/read_1dsfm.h"
 #include "theia/io/read_bundler_files.h"
 #include "theia/io/read_calibration.h"
+#include "theia/io/read_extrinsics.h"
 #include "theia/io/read_keypoints_and_descriptors.h"
 #include "theia/io/read_matches.h"
 #include "theia/io/read_matches_deprecated.h"

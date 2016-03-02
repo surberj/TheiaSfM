@@ -150,6 +150,9 @@ class ReconstructionBuilder {
   // successfully estimated.
   bool BuildReconstruction(std::vector<Reconstruction*>* reconstructions);
 
+  // Adds extrinsics from file to the reconstructions View Objects.
+  bool AddExtrinsicsToViews(const std::string& extrinsics_file);
+
  private:
   // Adds the given matches as edges in the view graph.
   void AddMatchToViewGraph(const ViewId view_id1,

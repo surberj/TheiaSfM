@@ -39,6 +39,7 @@
 #include <string>
 #include <vector>
 
+#include "theia/io/read_extrinsics.h"
 #include "theia/sfm/camera_intrinsics_prior.h"
 #include "theia/sfm/reconstruction.h"
 #include "theia/sfm/reconstruction_estimator.h"
@@ -195,6 +196,16 @@ void ReconstructionBuilder::RemoveUncalibratedViews() {
       view_graph_->RemoveView(view_id);
     }
   }
+}
+
+bool ReconstructionBuilder::AddExtrinsicsToViews(const std::string& extrinsics_file) {
+  if (extrinsics_file.size() != 0) {
+    CHECK(theia::ReadExtrinsics(extrinsics_file,
+                   reconstruction_.get()))
+        << "Could not read extrinsics file.";
+    LOG(INFO) << "reconstruction_builder: AddExtrinsicsToViews not yet implemented";
+  }
+  return true;
 }
 
 bool ReconstructionBuilder::ExtractAndMatchFeatures() {
