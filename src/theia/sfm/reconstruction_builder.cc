@@ -203,7 +203,6 @@ bool ReconstructionBuilder::AddExtrinsicsToViews(const std::string& extrinsics_f
     CHECK(theia::ReadExtrinsics(extrinsics_file,
                    reconstruction_.get()))
         << "Could not read extrinsics file.";
-    LOG(INFO) << "reconstruction_builder: AddExtrinsicsToViews not yet implemented";
   }
   return true;
 }
