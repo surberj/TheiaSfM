@@ -89,8 +89,11 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    // We write the following values for aspect ratio, skew, and radial distortion
+    // We write the following values for focal length, aspect ratio, skew, and radial distortion (k1, k2)
     ofs << image_name << " 614 367 267 1.0 1.0 -0.4 0.17\n";  // phycam_72 calibration from kalibr and matlab
+    // ofs << image_name << " 366 355 266 1.0 1.0 -0.311 0.085\n";  // phycam_131 calibration from kalibr and matlab
+    // ofs << image_name << " 458 367 248 1.0 1.0 -0.28 0.07\n";  // visensor machine_hall calibration from kalibr
+    //ofs << image_name << " 467 368 244 1.0 1.0 -0.28 0.07\n";  // visensor rothenturm calibration from kalibr
   }
   ofs.close();
 }

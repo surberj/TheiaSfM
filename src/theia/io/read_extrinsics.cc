@@ -65,32 +65,22 @@ bool ReadExtrinsics(const std::string& extrinsics_file,
   ifs >> value;
   const int num_views_in_extrinsics_file = std::stoi(value);
 
-  CHECK_EQ(num_views, num_views_in_extrinsics_file) << "read_extrinsics: number of views "
-                          "between reconstruction and extrinsics file do not match.";
+  // CHECK_EQ(num_views, num_views_in_extrinsics_file) << "read_extrinsics: number of views "
+  //                         "between reconstruction and extrinsics file do not match.";
 
   LOG(INFO)
           << "read_extrinsics:   reconstruction->NumViews() = " << num_views;
   LOG(INFO)
           << "read_extrinsics: num_views_in_extrinsics_file = " << num_views_in_extrinsics_file;
 
+  int count_skipped_lines = 0;
 
   // Read camera extrinsics
-  int i = 0;
-  for (const ViewId view_id : reconstruction->ViewIds()) {
-    // read in file and break if end of file is reached.
+  for (int i=0; i<num_views_in_extrinsics_file; i++) {
+
+    // read in camera i called filename
     std::string filename;
     ifs >> filename;
-    if (ifs.eof()) {
-      LOG(INFO)
-            << "read_extrinsics: WARNING: reached end of extrinsics file, which should not happen";
-      break;
-    }
-    // excess view and camera of reconstruction
-    View* view = reconstruction->MutableView(view_id);
-    Camera* camera = view->MutableCamera();
-
-    // set estimated (since the given extrinsics are a prior estimate)
-    view->SetEstimated(true);
 
     // read in position and rotation of camera i
     Eigen::Vector3d position;
@@ -121,10 +111,25 @@ bool ReadExtrinsics(const std::string& extrinsics_file,
     ifs >> value;
     rotation(2,2) = std::stod(value);
 
+    // find view in reconstruction
+    const ViewId view_id = reconstruction->ViewIdFromName(filename);
+
+    // skip camera if it is not in reconstruction
+    if (view_id == kInvalidViewId) {
+      LOG(INFO)
+            << "read_extrinsics: skip camera " << filename << " of extrinsics file, skip total " << count_skipped_lines << " lines";  
+      count_skipped_lines++;    
+      continue;
+    }
+
+    // excess view and camera of reconstruction
+    View* view = reconstruction->MutableView(view_id);
+    Camera* camera = view->MutableCamera();
+
+    // set camera extrinsics
+    //view->SetEstimated(true);
     camera->SetPosition(position);
     camera->SetOrientationFromRotationMatrix(rotation);
-
-    ++i;
   }
   return true;
 }
