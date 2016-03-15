@@ -351,7 +351,7 @@ void AddImagesToReconstructionBuilder(
                                  &camera_intrinsics_prior))
         << "Could not read calibration file.";
   }
-  LOG(INFO) << "checkpoint 1";
+
   // Load extrinsics file if it is provided.
   std::unordered_map<std::string, theia::CameraExtrinsicsPrior>
       camera_extrinsics_prior;
@@ -389,6 +389,8 @@ int main(int argc, char *argv[]) {
   THEIA_GFLAGS_NAMESPACE::ParseCommandLineFlags(&argc, &argv, true);
   google::InitGoogleLogging(argv[0]);
 
+  LOG(INFO) << "debugging on";
+
   CHECK_GT(FLAGS_output_reconstruction.size(), 0)
       << "Must specify a filepath to output the reconstruction.";
 
@@ -405,6 +407,8 @@ int main(int argc, char *argv[]) {
     LOG(FATAL)
         << "You must specifiy either images to reconstruct or a match file.";
   }
+
+
 
   std::vector<Reconstruction*> reconstructions;
   CHECK(reconstruction_builder.BuildReconstruction(&reconstructions))

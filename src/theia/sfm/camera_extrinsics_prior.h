@@ -37,31 +37,17 @@
 
 #include <cereal/access.hpp>
 
+#include "theia/sfm/camera_intrinsics_prior.h"
+
 namespace theia {
 
-// Extrinsics (poses) are not always available, so we need this helper struct to
-// keep track of which data fields have been set.
-struct ExtrinsicsPrior {
- public:
-  bool is_set = false;
-  double value = 0;
-
- private:
-  // Templated method for disk I/O with cereal. This method tells cereal which
-  // data members should be used when reading/writing to/from disk.
-  friend class cereal::access;
-  template <class Archive>
-  void serialize(Archive& ar) {  // NOLINT
-    ar(is_set, value);
-  }
-};
 // Prior information about a View. This is typically gathered from GPS or
 // sensor data that provides information about camera position and rotation.
 struct CameraExtrinsicsPrior {
  public:
 
-  ExtrinsicsPrior position[3];
-  ExtrinsicsPrior rotation[9];
+  Prior position[3];
+  Prior rotation[9];
 
  private:
   // Templated method for disk I/O with cereal. This method tells cereal which

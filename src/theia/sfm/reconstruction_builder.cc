@@ -225,7 +225,7 @@ bool ReconstructionBuilder::ExtractAndMatchFeatures() {
   CHECK_EQ(view_graph_->NumViews(), 0) << "Cannot call ExtractAndMatchFeatures "
                                           "after TwoViewMatches has been "
                                           "called.";
-
+                                          
   // Extract features and obtain the feature matches.
   std::vector<ImagePairMatch> matches;
   std::vector<CameraIntrinsicsPrior> camera_intrinsics_priors;
@@ -250,9 +250,6 @@ bool ReconstructionBuilder::ExtractAndMatchFeatures() {
       image_filepaths_.size() * (image_filepaths_.size() - 1) / 2;
   LOG(INFO) << matches.size() << " of " << num_total_view_pairs
             << " view pairs were matched and geometrically verified.";
-
-  // debug: stop here.
-  CHECK_EQ(0,1);
 
   // Add the EXIF data to each view.
   std::vector<std::string> image_filenames(image_filepaths_.size());
