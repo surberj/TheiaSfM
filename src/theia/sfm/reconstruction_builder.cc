@@ -251,6 +251,9 @@ bool ReconstructionBuilder::ExtractAndMatchFeatures() {
   LOG(INFO) << matches.size() << " of " << num_total_view_pairs
             << " view pairs were matched and geometrically verified.";
 
+  // debug: stop here.
+  CHECK_EQ(0,1);
+
   // Add the EXIF data to each view.
   std::vector<std::string> image_filenames(image_filepaths_.size());
   for (int i = 0; i < image_filepaths_.size(); i++) {

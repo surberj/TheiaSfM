@@ -351,7 +351,7 @@ void AddImagesToReconstructionBuilder(
                                  &camera_intrinsics_prior))
         << "Could not read calibration file.";
   }
-
+  LOG(INFO) << "checkpoint 1";
   // Load extrinsics file if it is provided.
   std::unordered_map<std::string, theia::CameraExtrinsicsPrior>
       camera_extrinsics_prior;
