@@ -1,4 +1,4 @@
-// Copyright (C) 2015 The Regents of the University of California (Regents).
+// Copyright (C) 2014 The Regents of the University of California (Regents).
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -32,59 +32,23 @@
 // Please contact the author of this library if you have any questions.
 // Author: Chris Sweeney (cmsweeney@cs.ucsb.edu)
 
-#ifndef THEIA_SFM_VIEW_H_
-#define THEIA_SFM_VIEW_H_
+#ifndef THEIA_SFM_CAMERA_EXTRINSICS_PRIOR_H_
+#define THEIA_SFM_CAMERA_EXTRINSICS_PRIOR_H_
 
 #include <cereal/access.hpp>
-#include <cereal/types/string.hpp>
-#include <cereal/types/unordered_map.hpp>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-#include "theia/sfm/camera/camera.h"
 #include "theia/sfm/camera_intrinsics_prior.h"
-#include "theia/sfm/camera_extrinsics_prior.h"
-#include "theia/sfm/feature.h"
-#include "theia/sfm/types.h"
 
 namespace theia {
 
-// A View contains high level information about an image that has been
-// captured. This includes the name, EXIF metadata, and track information that
-// is found through feature matching.
-class View {
+// Use struct Prior of camera_intriniscs_prior for assignment of values.
+
+// Prior information about a View. This is typically gathered from GPS or
+// sensor data that provides information about camera position and rotation.
+struct CameraExtrinsicsPrior {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  View();
-  explicit View(const std::string& name);
-
-  ~View() {}
-
-  const std::string& Name() const;
-
-  void SetEstimated(bool is_estimated);
-  bool IsEstimated() const;
-
-  const class Camera& Camera() const;
-  class Camera* MutableCamera();
-
-  const struct CameraIntrinsicsPrior& CameraIntrinsicsPrior() const;
-  struct CameraIntrinsicsPrior* MutableCameraIntrinsicsPrior();
-
-  const struct CameraExtrinsicsPrior& CameraExtrinsicsPrior() const;
-  struct CameraExtrinsicsPrior* MutableCameraExtrinsicsPrior();
-
-  int NumFeatures() const;
-
-  std::vector<TrackId> TrackIds() const;
-
-  const Feature* GetFeature(const TrackId track_id) const;
-
-  void AddFeature(const TrackId track_id, const Feature& feature);
-
-  bool RemoveFeature(const TrackId track_id);
+  Prior position[3];
+  Prior rotation[9];
 
  private:
   // Templated method for disk I/O with cereal. This method tells cereal which
@@ -92,17 +56,21 @@ class View {
   friend class cereal::access;
   template <class Archive>
   void serialize(Archive& ar) {  // NOLINT
-    ar(name_, is_estimated_, camera_, camera_intrinsics_prior_, camera_extrinsics_prior_, features_);
+    ar(position[0],
+       position[1],
+       position[2],
+       rotation[0],
+       rotation[1],
+       rotation[2],
+       rotation[3],
+       rotation[4],
+       rotation[5],
+       rotation[6],
+       rotation[7],
+       rotation[8]);
   }
-
-  std::string name_;
-  bool is_estimated_;
-  class Camera camera_;
-  struct CameraIntrinsicsPrior camera_intrinsics_prior_;
-  struct CameraExtrinsicsPrior camera_extrinsics_prior_;
-  std::unordered_map<TrackId, Feature> features_;
 };
 
 }  // namespace theia
 
-#endif  // THEIA_SFM_VIEW_H_
+#endif  // THEIA_SFM_CAMERA_EXTRINSICS_PRIOR_H_

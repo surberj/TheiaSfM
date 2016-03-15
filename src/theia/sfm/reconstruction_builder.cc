@@ -41,6 +41,7 @@
 
 #include "theia/io/read_extrinsics.h"
 #include "theia/sfm/camera_intrinsics_prior.h"
+#include "theia/sfm/camera_extrinsics_prior.h"
 #include "theia/sfm/reconstruction.h"
 #include "theia/sfm/reconstruction_estimator.h"
 #include "theia/sfm/track_builder.h"
@@ -55,6 +56,7 @@ namespace {
 
 bool AddViewToReconstruction(const std::string& image_filepath,
                              const CameraIntrinsicsPrior* intrinsics,
+                             const CameraExtrinsicsPrior* extrinsics,
                              Reconstruction* reconstruction) {
   std::string image_filename;
   CHECK(GetFilenameFromFilepath(image_filepath, true, &image_filename));
@@ -71,6 +73,11 @@ bool AddViewToReconstruction(const std::string& image_filepath,
   if (intrinsics != nullptr) {
     View* view = reconstruction->MutableView(view_id);
     *view->MutableCameraIntrinsicsPrior() = *intrinsics;
+  }
+  // Add the camera extrinsics priors if available.
+  if (extrinsics != nullptr) {
+    View* view = reconstruction->MutableView(view_id);
+    *view->MutableCameraExtrinsicsPrior() = *extrinsics;
   }
   return true;
 }
@@ -168,7 +175,7 @@ ReconstructionBuilder::~ReconstructionBuilder() {}
 
 bool ReconstructionBuilder::AddImage(const std::string& image_filepath) {
   image_filepaths_.emplace_back(image_filepath);
-  if (!AddViewToReconstruction(image_filepath, NULL, reconstruction_.get())) {
+  if (!AddViewToReconstruction(image_filepath, NULL, NULL, reconstruction_.get())) {
     return false;
   }
   return feature_extractor_and_matcher_->AddImage(image_filepath);
@@ -180,6 +187,22 @@ bool ReconstructionBuilder::AddImageWithCameraIntrinsicsPrior(
   image_filepaths_.emplace_back(image_filepath);
   if (!AddViewToReconstruction(image_filepath,
                                &camera_intrinsics_prior,
+                               NULL,
+                               reconstruction_.get())) {
+    return false;
+  }
+  return feature_extractor_and_matcher_->AddImage(image_filepath,
+                                                  camera_intrinsics_prior);
+}
+
+bool ReconstructionBuilder::AddImageWithCameraPriors(
+    const std::string& image_filepath,
+    const CameraIntrinsicsPrior& camera_intrinsics_prior,
+    const CameraExtrinsicsPrior& camera_extrinsics_prior) {
+  image_filepaths_.emplace_back(image_filepath);
+  if (!AddViewToReconstruction(image_filepath,
+                               &camera_intrinsics_prior,
+                               &camera_extrinsics_prior,
                                reconstruction_.get())) {
     return false;
   }
@@ -196,15 +219,6 @@ void ReconstructionBuilder::RemoveUncalibratedViews() {
       view_graph_->RemoveView(view_id);
     }
   }
-}
-
-bool ReconstructionBuilder::AddExtrinsicsToViews(const std::string& extrinsics_file) {
-  if (extrinsics_file.size() != 0) {
-    CHECK(theia::ReadExtrinsics(extrinsics_file,
-                   reconstruction_.get()))
-        << "Could not read extrinsics file.";
-  }
-  return true;
 }
 
 bool ReconstructionBuilder::ExtractAndMatchFeatures() {

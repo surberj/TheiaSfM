@@ -44,13 +44,15 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <unordered_map>
 
-#include "theia/sfm/reconstruction.h"
+#include "theia/sfm/camera_intrinsics_prior.h"
 
 namespace theia {
 
 bool ReadExtrinsics(const std::string& extrinsics_file,
-                     Reconstruction* reconstruction) {
+                     std::unordered_map<std::string, CameraExtrinsicsPrior>*
+                         camera_extrinsics_prior) {
 
   // open extrinsics file
   std::ifstream ifs(extrinsics_file.c_str(), std::ios::in);
@@ -59,21 +61,12 @@ bool ReadExtrinsics(const std::string& extrinsics_file,
     return false;
   }
 
-  // check if size of file matches reconstruction->NumViews()
-  const int num_views = reconstruction->NumViews();
+  // get number of cameras from first line:
   std::string value;
   ifs >> value;
   const int num_views_in_extrinsics_file = std::stoi(value);
-
-  // CHECK_EQ(num_views, num_views_in_extrinsics_file) << "read_extrinsics: number of views "
-  //                         "between reconstruction and extrinsics file do not match.";
-
-  LOG(INFO)
-          << "read_extrinsics:   reconstruction->NumViews() = " << num_views;
   LOG(INFO)
           << "read_extrinsics: num_views_in_extrinsics_file = " << num_views_in_extrinsics_file;
-
-  int count_skipped_lines = 0;
 
   // Read camera extrinsics
   for (int i=0; i<num_views_in_extrinsics_file; i++) {
@@ -81,55 +74,50 @@ bool ReadExtrinsics(const std::string& extrinsics_file,
     // read in camera i called filename
     std::string filename;
     ifs >> filename;
-
-    // read in position and rotation of camera i
-    Eigen::Vector3d position;
-    Eigen::Matrix3d rotation;
-    std::string value;
-    ifs >> value;
-    position(0) = std::stod(value);
-    ifs >> value;
-    position(1) = std::stod(value);
-    ifs >> value;
-    position(2) = std::stod(value);
-    ifs >> value;
-    rotation(0,0) = std::stod(value);
-    ifs >> value;
-    rotation(0,1) = std::stod(value);
-    ifs >> value;
-    rotation(0,2) = std::stod(value);
-    ifs >> value;
-    rotation(1,0) = std::stod(value);
-    ifs >> value;
-    rotation(1,1) = std::stod(value);
-    ifs >> value;
-    rotation(1,2) = std::stod(value);
-    ifs >> value;
-    rotation(2,0) = std::stod(value);
-    ifs >> value;
-    rotation(2,1) = std::stod(value);
-    ifs >> value;
-    rotation(2,2) = std::stod(value);
-
-    // find view in reconstruction
-    const ViewId view_id = reconstruction->ViewIdFromName(filename);
-
-    // skip camera if it is not in reconstruction
-    if (view_id == kInvalidViewId) {
-      LOG(INFO)
-            << "read_extrinsics: skip camera " << filename << " of extrinsics file, skip total " << count_skipped_lines << " lines";  
-      count_skipped_lines++;    
-      continue;
+    if (filename.length() == 0) {
+      break;
     }
 
-    // excess view and camera of reconstruction
-    View* view = reconstruction->MutableView(view_id);
-    Camera* camera = view->MutableCamera();
+    // read in position and rotation of camera i
+    CameraExtrinsicsPrior temp_camera_extrinsics_prior;
 
-    // set camera extrinsics
-    //view->SetEstimated(true);
-    camera->SetPosition(position);
-    camera->SetOrientationFromRotationMatrix(rotation);
+    temp_camera_extrinsics_prior.position[0].is_set = true;
+    ifs >> temp_camera_extrinsics_prior.position[0].value;
+    temp_camera_extrinsics_prior.position[1].is_set = true;
+    ifs >> temp_camera_extrinsics_prior.position[1].value;
+    temp_camera_extrinsics_prior.position[2].is_set = true;
+    ifs >> temp_camera_extrinsics_prior.position[2].value;
+
+    temp_camera_extrinsics_prior.rotation[0].is_set = true;
+    ifs >> temp_camera_extrinsics_prior.rotation[0].value;
+    temp_camera_extrinsics_prior.rotation[1].is_set = true;
+    ifs >> temp_camera_extrinsics_prior.rotation[1].value;
+    temp_camera_extrinsics_prior.rotation[2].is_set = true;
+    ifs >> temp_camera_extrinsics_prior.rotation[2].value;
+    temp_camera_extrinsics_prior.rotation[3].is_set = true;
+    ifs >> temp_camera_extrinsics_prior.rotation[3].value;
+    temp_camera_extrinsics_prior.rotation[4].is_set = true;
+    ifs >> temp_camera_extrinsics_prior.rotation[4].value;
+    temp_camera_extrinsics_prior.rotation[5].is_set = true;
+    ifs >> temp_camera_extrinsics_prior.rotation[5].value;
+    temp_camera_extrinsics_prior.rotation[6].is_set = true;
+    ifs >> temp_camera_extrinsics_prior.rotation[6].value;
+    temp_camera_extrinsics_prior.rotation[7].is_set = true;
+    ifs >> temp_camera_extrinsics_prior.rotation[7].value;
+    temp_camera_extrinsics_prior.rotation[8].is_set = true;
+    ifs >> temp_camera_extrinsics_prior.rotation[8].value;
+
+    // write extrinsics to Prior
+    (*camera_extrinsics_prior)[filename] = temp_camera_extrinsics_prior;
+
+// write extrinsics directly to the reconstruction views:
+//    // excess view and camera of reconstruction
+//    View* view = reconstruction->MutableView(view_id);
+//    Camera* camera = view->MutableCamera();
+//    // set camera extrinsics
+//    //view->SetEstimated(true);
+//    camera->SetPosition(position);
+//    camera->SetOrientationFromRotationMatrix(rotation);
   }
   return true;
 }

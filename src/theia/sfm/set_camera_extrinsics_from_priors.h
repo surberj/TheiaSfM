@@ -32,85 +32,20 @@
 // Please contact the author of this library if you have any questions.
 // Author: Chris Sweeney (cmsweeney@cs.ucsb.edu)
 
-#include "theia/sfm/view.h"
-
-#include <string>
-#include <unordered_set>
-#include <unordered_map>
-
-#include "theia/util/map_util.h"
-#include "theia/sfm/camera/camera.h"
-#include "theia/sfm/types.h"
-#include "theia/sfm/feature.h"
-#include "theia/sfm/camera_intrinsics_prior.h"
-#include "theia/sfm/camera_extrinsics_prior.h"
+#ifndef THEIA_SFM_SET_CAMERA_EXTRINSICS_FROM_PRIORS_H_
+#define THEIA_SFM_SET_CAMERA_EXTRINSICS_FROM_PRIORS_H_
 
 namespace theia {
 
-View::View() : name_(""), is_estimated_(false) {}
+class Reconstruction;
+class View;
 
-View::View(const std::string& name)
-    : name_(name), is_estimated_(false) {}
+// Sets the camera extrinsics (poses) from the CameraExtrinsicsPrior of each view.
+void SetViewCameraExtrinsicsFromPriors(View* view);
 
-const std::string& View::Name() const {
-  return name_;
-}
-
-void View::SetEstimated(bool is_estimated) {
-  is_estimated_ = is_estimated;
-}
-
-bool View::IsEstimated() const {
-  return is_estimated_;
-}
-
-const class Camera& View::Camera() const {
-  return camera_;
-}
-
-class Camera* View::MutableCamera() {
-  return &camera_;
-}
-
-const struct CameraIntrinsicsPrior& View::CameraIntrinsicsPrior() const {
-  return camera_intrinsics_prior_;
-}
-
-struct CameraIntrinsicsPrior* View::MutableCameraIntrinsicsPrior() {
-  return &camera_intrinsics_prior_;
-}
-
-const struct CameraExtrinsicsPrior& View::CameraExtrinsicsPrior() const {
-  return camera_extrinsics_prior_;
-}
-
-struct CameraExtrinsicsPrior* View::MutableCameraExtrinsicsPrior() {
-  return &camera_extrinsics_prior_;
-}
-
-int View::NumFeatures() const {
-  return features_.size();
-}
-
-std::vector<TrackId> View::TrackIds() const {
-  std::vector<TrackId> track_ids;
-  track_ids.reserve(features_.size());
-  for (const auto& track : features_) {
-    track_ids.emplace_back(track.first);
-  }
-  return track_ids;
-}
-
-const Feature* View::GetFeature(const TrackId track_id) const {
-  return FindOrNull(features_, track_id);
-}
-
-void View::AddFeature(const TrackId track_id, const Feature& feature) {
-  features_[track_id] = feature;
-}
-
-bool View::RemoveFeature(const TrackId track_id) {
-  return features_.erase(track_id) > 0;
-}
+// Sets the camera extrinsics for every view in the reconstruction.
+void SetCameraExtrinsicsFromPriors(Reconstruction* reconstruction);
 
 }  // namespace theia
+
+#endif  // THEIA_SFM_SET_CAMERA_EXTRINSICS_FROM_PRIORS_H_

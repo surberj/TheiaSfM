@@ -45,6 +45,7 @@
 #include "theia/matching/create_feature_matcher.h"
 #include "theia/matching/feature_matcher_options.h"
 #include "theia/sfm/camera_intrinsics_prior.h"
+#include "theia/sfm/camera_extrinsics_prior.h"
 #include "theia/sfm/feature_extractor_and_matcher.h"
 #include "theia/sfm/reconstruction_estimator_options.h"
 
@@ -119,10 +120,16 @@ class ReconstructionBuilder {
   // Add an image to the reconstruction.
   bool AddImage(const std::string& image_filepath);
 
-  // Same as above, but with the camera priors manually specified.
+  // Same as above, but with the camera intrinsics priors manually specified.
   bool AddImageWithCameraIntrinsicsPrior(
       const std::string& image_filepath,
       const CameraIntrinsicsPrior& camera_intrinsics_prior);
+
+  // Same as above, but with the camera priors manually specified.
+  bool AddImageWithCameraPriors(
+      const std::string& image_filepath,
+      const CameraIntrinsicsPrior& camera_intrinsics_prior,
+      const CameraExtrinsicsPrior& camera_extrinsics_prior);
 
   // Add a match to the view graph. Either this method is repeatedly called or
   // ExtractAndMatchFeatures must be called.
@@ -149,9 +156,6 @@ class ReconstructionBuilder {
   // unestimated views. We repeat this process until no more views can be
   // successfully estimated.
   bool BuildReconstruction(std::vector<Reconstruction*>* reconstructions);
-
-  // Adds extrinsics from file to the reconstructions View Objects.
-  bool AddExtrinsicsToViews(const std::string& extrinsics_file);
 
  private:
   // Adds the given matches as edges in the view graph.

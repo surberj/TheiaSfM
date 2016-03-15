@@ -36,27 +36,21 @@
 #define THEIA_IO_READ_EXTRINSICS_H_
 
 #include <string>
+#include <unordered_map>
+
+#include "theia/sfm/camera_extrinsics_prior.h"
 
 namespace theia {
-
-class Reconstruction;
 
 // Reads the camera extrinsics for images that are to be reconstructed. The
 // extrinsics file should be a text file where each line is in the form of:
 //
 // <number_of_images>
-// <image_name> <rot1> ... <rot9> <trans1> ... <trans3>
-//
-// where ppx, ppy are the principal points of the image and k1, k2 are the two
-// radial distortion parameters.
-//
-// It is assumed that the principal point lies at the center of the image, so
-// the width and height are set to be twice those values.
-//
-// A calibration file is optional and it is not required that all images have
-// calibration.
+// <image_name> <trans1> ... <trans3> <rot1> ... <rot9> 
+
 bool ReadExtrinsics(const std::string& extrinsics_file,
-                     Reconstruction* reconstruction);
+                     std::unordered_map<std::string, CameraExtrinsicsPrior>*
+                         camera_extrinsics_prior);
 
 }  // namespace theia
 

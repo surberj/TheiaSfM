@@ -352,6 +352,15 @@ void AddImagesToReconstructionBuilder(
         << "Could not read calibration file.";
   }
 
+  // Load extrinsics file if it is provided.
+  std::unordered_map<std::string, theia::CameraExtrinsicsPrior>
+      camera_extrinsics_prior;
+  if (FLAGS_extrinsics_file.size() != 0) {
+    CHECK(theia::ReadExtrinsics(FLAGS_extrinsics_file,
+                                 &camera_extrinsics_prior))
+        << "Could not read extrinsics file.";
+  }
+
   // Add images with possible calibration.
   for (const std::string& image_file : image_files) {
     std::string image_filename;
@@ -359,7 +368,12 @@ void AddImagesToReconstructionBuilder(
 
     const theia::CameraIntrinsicsPrior* image_camera_intrinsics_prior =
         FindOrNull(camera_intrinsics_prior, image_filename);
-    if (image_camera_intrinsics_prior != nullptr) {
+    const theia::CameraExtrinsicsPrior* image_camera_extrinsics_prior =
+        FindOrNull(camera_extrinsics_prior, image_filename);
+    if (image_camera_intrinsics_prior != nullptr && image_camera_extrinsics_prior != nullptr) {
+      CHECK(reconstruction_builder->AddImageWithCameraPriors(
+          image_file, *image_camera_intrinsics_prior, *image_camera_extrinsics_prior));
+    } else if (image_camera_intrinsics_prior != nullptr) {
       CHECK(reconstruction_builder->AddImageWithCameraIntrinsicsPrior(
           image_file, *image_camera_intrinsics_prior));
     } else {
@@ -390,15 +404,6 @@ int main(int argc, char *argv[]) {
   } else {
     LOG(FATAL)
         << "You must specifiy either images to reconstruct or a match file.";
-  }
-
-  // Add camera extrinsics to Views
-  if (FLAGS_extrinsics_file.size() != 0) {
-    CHECK(reconstruction_builder.AddExtrinsicsToViews(FLAGS_extrinsics_file))
-        << "Could not read extrinsics file.";
-  } else {
-    LOG(FATAL)
-        << "You must specifiy an extrinsics file.";
   }
 
   std::vector<Reconstruction*> reconstructions;
