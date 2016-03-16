@@ -103,6 +103,7 @@ add_definitions(-DTHEIA_DATA_DIR="${CMAKE_SOURCE_DIR}/data")
 
 # Eigen
 set(MIN_EIGEN_VERSION 3.2.0)
+set(EIGEN_INCLUDE_DIR "/usr/local/include/eigen3")
 find_package(Eigen ${MIN_EIGEN_VERSION} REQUIRED)
 if (EIGEN_FOUND)
   message("-- Found Eigen version ${EIGEN_VERSION}: ${EIGEN_INCLUDE_DIRS}")
