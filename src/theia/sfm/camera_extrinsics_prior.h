@@ -43,6 +43,7 @@ namespace theia {
 
 // Prior information about a View. This is typically gathered from GPS or
 // sensor data that provides information about camera position and rotation.
+// Use Prior struct defined in camera_intrinsics_prior.h
 struct CameraExtrinsicsPrior {
  public:
 

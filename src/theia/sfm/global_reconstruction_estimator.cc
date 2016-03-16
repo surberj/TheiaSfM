@@ -55,6 +55,7 @@
 #include "theia/sfm/reconstruction_estimator_options.h"
 #include "theia/sfm/reconstruction_estimator_utils.h"
 #include "theia/sfm/set_camera_intrinsics_from_priors.h"
+#include "theia/sfm/set_camera_extrinsics_from_priors.h"
 #include "theia/sfm/twoview_info.h"
 #include "theia/sfm/view_graph/orientations_from_view_graph.h"
 #include "theia/sfm/view_graph/remove_disconnected_view_pairs.h"
@@ -182,6 +183,12 @@ ReconstructionEstimatorSummary GlobalReconstructionEstimator::Estimate(
   CalibrateCameras();
   summary.camera_intrinsics_calibration_time = timer.ElapsedTimeInSeconds();
 
+/*    // debug:
+    const ViewId view_id = reconstruction_->ViewIdFromName("image_0_2407.ppm");
+    CHECK_EQ(0,1) << "\ndebug stop: image_0_2407.ppm: "
+                  << "\nposition: \n" << reconstruction_->View(view_id)->Camera().GetPosition()
+                  << "\nfocal: \n" << reconstruction_->View(view_id)->Camera().FocalLength();
+*/
   // Step 3. Estimate global rotations.
   LOG(INFO) << "Estimating the global rotations of all cameras.";
   timer.Reset();
@@ -319,6 +326,7 @@ bool GlobalReconstructionEstimator::FilterInitialViewGraph() {
 
 void GlobalReconstructionEstimator::CalibrateCameras() {
   SetCameraIntrinsicsFromPriors(reconstruction_);
+  SetCameraExtrinsicsFromPriors(reconstruction_);
 }
 
 bool GlobalReconstructionEstimator::EstimateGlobalRotations() {
